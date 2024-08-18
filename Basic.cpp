@@ -449,6 +449,411 @@ bool bipotite(int v,vector<int> adj[]){
     }
     return true;
 }
+//G-19 Detect a cycle in a directed Graph
+
+//now this is all stuff for detecting a cycle in a Directed graph(notice that DIRECTED)
+
+bool dfs(int node,int vis[],int path[],int adj[]){
+    vis[node] = 1;
+    path[node] = 1;
+
+    for(auto it: adj[node]){
+        
+        if(!vis[it]){
+            if(dfs(it,vis,path,adj)==true) return true;
+        }
+        else if(path[it]) return true;
+
+    }
+
+    path[node] = 0; //while returning -> unmarked the path 
+    return false;
+} 
+bool detectAcycle(int V,vector<int> adj[]){
+    
+    int vis[v] = {0};
+    int path[v] = {0};
+   
+   //loop for component of a graph
+    for(int i = 1;i<v;i++){
+         if(!vis[i]){
+            if(dfs(i,vis,path,adj)==false) return false;
+         }
+         
+    }
+    return true;
+
+}
+
+//Eventual Safe States problem 
+ //https://www.geeksforgeeks.org/problems/eventual-safe-states/1
+ //https://leetcode.com/problems/find-eventual-safe-states/description/
+
+ //Descriptions -> all node whos does not have a cycle is SafeNode
+
+
+ bool dfs(int node ,int vis[],int path[],int check[],int adj[]){
+    vis[node] = 1;
+    path[node] = 1;
+    check[node] = 0;
+    for(auto it : adj[node]){
+        if(!vis[it])
+        if(dfs(it,vis,path,check,adj)==true) {
+            check[it] = 0; //if cycle not be a safe node
+            return true;
+        }
+        if(path[it]){
+            check[it] = 0; //if cycle not be a safe node
+            return true;
+        }
+    }
+
+   //if no cycle code is come this side and mark all safe node to 1
+
+    check[node] = 1;
+    path[node] = 0;
+    return false;
+ }
+
+ vector<int> SafeNode(int v,vector<int> adj[]){
+    int vis[v] = {0};
+    int path[v] = {0};
+    int check[v] = {0};
+    vector<int> safe;
+
+    for(int i= 0;i<v;i++){
+        if(!vis[i]){
+            dfs(i,vis,path,check,adj)
+            
+        }
+    }
+
+    //check arry with value 1 have a safe node , put it into the safe vector and returm\n
+    for(int i = 0;i<v;i++){
+        if(check[i]==1){
+            safe.push_back(i);
+        }
+    }
+    return safe; //return
+ }
+
+ // Eventual Safe Node Problem
+ class Solution {
+public:
+
+    bool dfs(int node, vector<int>& visited, vector<vector<int>>& graph){
+        
+        visited[node] = 2;
+        for(auto it : graph[node]){
+            if(!visited[it]){
+                if(dfs(it, visited, graph) == true){
+                    return true;
+                }
+            }
+            else if(visited[it] == 2){
+                return true;
+            }
+        }
+        visited[node] = 1;
+        return false;
+    }
+    vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        
+        int V = graph.size();
+
+        vector<int> visited(V, 0);
+        
+        for(int i = 0;i<V;i++){
+            if(!visited[i]){
+                dfs(i, visited, graph);
+            }
+        }
+
+        vector<int> safe_nodes;
+        
+        for(int i = 0;i<V;i++){
+            if(visited[i] == 1){
+                safe_nodes.push_back(i);
+            }
+        }
+
+        return safe_nodes;
+    }
+};
+
+
+
+
+
+ // TOPOLOGICAL SORTING 
+  
+  //Topological sorting for Directed Acyclic Graph (DAG) is a
+  // linear ordering of vertices
+  // such that for every directed edge u-v, vertex u comes before v in the ordering.
+
+  //Note: Topological Sorting for a graph is not possible if the graph is not a DAG.
+
+  //DAG - directed acyclic graph
+
+  //DAGs are a special type of graphs in which each edge is directed such that no cycle exists in the graph
+
+  //
+  
+class topologica_Sort{
+    private:
+     void dfs(int node,vector<int> &vis,stack<int> &st,vector<int> adj[]){
+        //visit current node;
+        vis[node] = 1;
+
+        for(auto it: adj[node]){
+            if(!vis[it]){
+                dfs(it,vis,st,adj);
+            }
+        }
+
+     st.push(node);
+
+     }
+    public:
+
+   vector<int> topo(int V,vector<int> adj[]){
+             
+        vector<int> v(V,0);
+        vector<int> ans;
+        stack<int> st;
+
+        //for component Graph;
+        for(int i=0;i<V;i++){
+            if(!vis[i]){
+                dfs(i,vis,st,adj);
+            }
+        }
+        
+        //store from top into ans DS;
+        while(!st.empty()){
+            ans.push_back(st.top());
+            st.pop();
+        }
+        return ans;
+
+   }
+
+
+
+};
+
+
+//KAHN'S AlgoriThm -> it is for TopoLogical Sorting 
+
+//Topological Sorted order: It is a linear ordering of vertices such that
+// for every directed edge u -> v
+//where vertex u comes before v in the ordering.
+
+//[link gfg refrence ] -> https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/
+
+/*
+Algo->>
+ 1. all nodes having inDegree 0 put it into the queue
+ 
+*/
+
+class KahnsAlgo{
+    public:
+
+    vector<int> topoSort(int v,vector<int> adj[]){
+
+        int indegree[v] = {0};
+        for(int i=0;i<v;i++){
+            for(auto it : adj[i]){
+                indegree[it]++;
+            }
+        }
+        //indegree is ready
+
+        queue<int> q;
+        for(int i = 0;i<V;i++){
+            if(indegree[i]==0){
+                q.push(i);
+            }
+        }
+
+        //q is ready with node having indegree 0;
+
+        vector<int> topo;
+
+        while(!q.empty()){
+            int node = q.front();
+            q.pop();
+            topo.push_back(node);
+            for(auto it: adj[node]){
+                indegree[it]--;
+                if(indegree[it]==0){
+                    q.push(it);
+                }
+            }
+        }
+        return topo;
+
+    }
+
+};
+
+
+//Cycle detection using KAhn algo
+
+/* as we know that topoSort algorithm is only for Directed Acyclic graph 
+   if we try this algorithm in a Directed graph our TopoSort is not fill */
+
+class CycleDetectUsingKHANs{
+     public:
+
+     bool cycle(int v,vector<int> adj[]){
+        int indegree[v] = {0};
+        //create indegree
+        for(int i=0;i<v;i++){
+            for(auto it: adj[i]){
+                indegree[it]++;
+            }
+        }
+        queue<int> q;
+
+        for(int i=0;i<v;i++){
+                if(indegree[i]==0){
+                    q.push(i);
+            }
+        }
+    vector<int> topo;
+         while(!q.empty()){
+            int node = q.front();
+            q.pop();
+            topo.push(node);
+            for(auto it: adj[node]){
+                indegree[it]--;
+                if(indegree[it]==0) q.push(it);
+            }
+         }
+     }
+     int n = topo.size();
+     if(n == v) return false;
+     return true;
+ 
+   };
+
+
+//Course Shedule I & II Problem
+// Course Shedule 2 -> https://leetcode.com/problems/course-schedule-ii/
+//Course Shedule 1 -> https://leetcode.com/problems/course-schedule/
+
+//using topoSort algoRithm
+class Solution {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        int N=numCourses;
+        vector<int>adj[N];
+        for(auto it:prerequisites){
+            adj[it[1]].push_back(it[0]);
+        }
+        int inDegree[N];
+        for(int i=0;i<N;i++){
+            inDegree[i]=0;
+        }
+        for(int i=0;i<N;i++){
+            for(auto it:adj[i]){
+                inDegree[it]++;
+            }
+        }
+        queue<int>q;
+        for(int i=0;i<N;i++){
+            if(inDegree[i]==0){
+                q.push(i);
+            }
+        }
+        vector<int>ans;
+        while(!q.empty()){
+            int node=q.front();
+            q.pop();
+            ans.push_back(node);
+            for(auto it:adj[node]){
+                inDegree[it]--;
+                if(inDegree[it]==0){
+                    q.push(it);
+                }
+
+            }
+        }
+        if(ans.size()==N)return ans;
+        return {};
+        
+    }
+};
+
+//Alien Dictionary 
+
+//https://www.geeksforgeeks.org/problems/alien-dictionary/1
+class Solution{
+    private:
+    vector<int> topoSort(int v,vector<int> adj[]){
+
+        int indegree[v] = {0};
+        for(int i=0;i<v;i++){
+            for(auto it : adj[i]){
+                indegree[it]++;
+            }
+        }
+        //indegree is ready
+
+        queue<int> q;
+        for(int i = 0;i<v;i++){
+            if(indegree[i]==0){
+                q.push(i);
+            }
+        }
+
+        //q is ready with node having indegree 0;
+
+        vector<int> topo;
+
+        while(!q.empty()){
+            int node = q.front();
+            q.pop();
+            topo.push_back(node);
+            for(auto it: adj[node]){
+                indegree[it]--;
+                if(indegree[it]==0){
+                    q.push(it);
+                }
+            }
+        }
+        return topo;
+
+    }
+    public:
+    string findOrder(string dict[], int N, int K) {
+        //code here
+        vector<int> adj[K];
+        
+        for(int i=0;i<N-1;i++){
+            
+            string s1 = dict[i];
+            string s2 = dict[i+1];
+            int len = min(s1.size(),s2.size());
+            for(int ptr = 0;ptr<len;ptr++){
+                if(s1[ptr]!=s2[ptr]){
+                    adj[s1[ptr]-'a'].push_back(s2[ptr]-'a');
+                    break;
+                }
+            }
+        }
+        vector<int> topo = topoSort(K,adj);
+        string s ="";
+        for(auto it: topo){
+            s = s + char(it+'a');
+        }
+        return s;
+        
+    }
+};
+
 int main(){
 graph g;
 
